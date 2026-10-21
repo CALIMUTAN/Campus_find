@@ -1,25 +1,29 @@
+@php
+    $input = 'w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-[#0F2A4A] focus:outline-none focus:ring-2 focus:ring-[#F5B301]/60';
+    $button = 'w-full rounded-lg bg-[#0F2A4A] px-5 py-3 font-semibold text-white hover:bg-[#16396a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5B301] focus-visible:ring-offset-2';
+@endphp
+
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+    <h1 class="font-display text-3xl font-bold text-[#0F2A4A]">Forgot your password?</h1>
+    <p class="mt-2 text-slate-600">Enter your email and we’ll send you a link to choose a new password.</p>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="mt-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="mt-8 space-y-5">
         @csrf
 
-        <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
+            <label for="email" class="mb-1.5 block text-sm font-medium text-slate-800">Email</label>
+            <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
+                   placeholder="you@school.edu.ph" class="{{ $input }}">
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="{{ $button }}">Email me a reset link</button>
     </form>
+
+    <p class="mt-8 text-center text-sm text-slate-600">
+        Remembered it?
+        <a href="{{ route('login') }}" class="font-semibold text-[#0F2A4A] underline-offset-2 hover:underline">Back to log in</a>
+    </p>
 </x-guest-layout>
