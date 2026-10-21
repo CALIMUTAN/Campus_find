@@ -15,7 +15,7 @@
         <div>
             <label for="email" class="mb-1.5 block text-sm font-medium text-slate-800">Email</label>
             <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
-                   placeholder="you@school.edu.ph" class="{{ $input }}">
+                   placeholder="you@gmail.com" class="{{ $input }}">
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
