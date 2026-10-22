@@ -31,10 +31,22 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
             <h1 class="font-display text-3xl font-bold tracking-tight text-[#0F2A4A]">Dashboard</h1>
             <div class="flex flex-wrap gap-3">
-                <a href="#" class="rounded-lg bg-[#0F2A4A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#16396a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5B301] focus-visible:ring-offset-2">I lost an item</a>
-                <a href="#" class="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#0F2A4A] hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F2A4A] focus-visible:ring-offset-2">I found an item</a>
+                <a href="{{ route('reports.create', 'lost') }}" class="rounded-lg bg-[#0F2A4A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#16396a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5B301] focus-visible:ring-offset-2">I lost an item</a>
+                <a href="{{ route('reports.create', 'found') }}" class="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-[#0F2A4A] hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F2A4A] focus-visible:ring-offset-2">I found an item</a>
             </div>
         </div>
+
+        {{-- Message after sending a report --}}
+        @if (session('report_status'))
+            <div x-data="{ show: true }" x-show="show" role="status"
+                 class="mt-6 flex items-start gap-3 rounded-xl border border-[#F5B301] bg-[#FFF8E1] px-4 py-3 text-sm text-[#0F2A4A]">
+                <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F5B301] text-xs" aria-hidden="true">&#10003;</span>
+                <p class="flex-1">{{ session('report_status') }}</p>
+                <button type="button" @click="show = false" class="rounded p-0.5 text-slate-500 hover:text-[#0F2A4A] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F2A4A]" aria-label="Close message">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                </button>
+            </div>
+        @endif
 
         <div class="mt-10 grid grid-cols-1 items-start gap-12 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-16">
 
