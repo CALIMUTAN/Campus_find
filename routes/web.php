@@ -1,7 +1,9 @@
+
 <?php
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Models\Report;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -9,7 +11,15 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+
+    $items = $user->reports()
+        ->latest()
+        ->get();
+
+    return view('dashboard', [
+        'items' => $items,
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Dashboard buttons: "I lost an item" and "I found an item"
