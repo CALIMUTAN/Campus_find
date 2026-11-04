@@ -13,16 +13,6 @@ use Throwable;
 
 class ReportController extends Controller
 {
-    public const CATEGORIES = [
-        'Bags',
-        'Electronics',
-        'IDs and wallets',
-        'Clothing',
-        'Keys',
-        'Books',
-        'Other',
-    ];
-
     // Keep uploads small and fast, especially for students on mobile data.
     private const MAX_PHOTO_KILOBYTES = 2048;
 
@@ -30,7 +20,7 @@ class ReportController extends Controller
     {
         return view('reports.create', [
             'type' => $type,
-            'categories' => self::CATEGORIES,
+            'categories' => Report::CATEGORIES,
         ]);
     }
 
@@ -38,7 +28,7 @@ class ReportController extends Controller
     {
         $rules = [
             'item_name' => ['required', 'string', 'max:100'],
-            'category' => ['required', Rule::in(self::CATEGORIES)],
+            'category' => ['required', Rule::in(Report::CATEGORIES)],
             'place' => ['required', 'string', 'max:150'],
             'date' => ['required', 'date', 'before_or_equal:today'],
             'description' => ['nullable', 'string', 'max:1000'],

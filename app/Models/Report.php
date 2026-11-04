@@ -8,6 +8,16 @@ use Illuminate\Support\Facades\Storage;
 
 class Report extends Model
 {
+    public const CATEGORIES = [
+        'Bags',
+        'Electronics',
+        'IDs and wallets',
+        'Clothing',
+        'Keys',
+        'Books',
+        'Other',
+    ];
+
     // Lost items start here and stay here until a matching found item turns up.
     public const STATUS_REPORTED = 'Reported';
 
