@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
@@ -7,6 +8,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Public catalog: anyone can browse/search, logged in or not,
+// same as the search bar on the front page.
+Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+Route::get('/items/{report}', [ItemController::class, 'show'])->name('items.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

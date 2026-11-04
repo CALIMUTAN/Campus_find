@@ -16,7 +16,7 @@
 
     $mainLinks = [
         ['label' => 'Dashboard',     'href' => route('dashboard'), 'active' => request()->routeIs('dashboard'), 'icon' => 'home'],
-        ['label' => 'Browse items',  'href' => '#', 'active' => false, 'icon' => 'search'],
+        ['label' => 'Browse items',  'href' => route('items.index'), 'active' => request()->routeIs('items.*'), 'icon' => 'search'],
         ['label' => 'My reports',    'href' => '#', 'active' => false, 'icon' => 'file'],
         ['label' => 'My claims',     'href' => '#', 'active' => false, 'icon' => 'tag'],
         ['label' => 'Notifications', 'href' => '#', 'active' => false, 'icon' => 'bell'],
