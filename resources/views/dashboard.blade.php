@@ -165,5 +165,35 @@
                 </ul>
             </div>
         </section>
+        {{-- Claim history (cf-010) --}}
+        @php
+            $claimStyles = [
+                'Pending' => 'bg-[#FFF8E1] text-[#946200]',
+                'Approved' => 'bg-[#0F2A4A] text-white',
+                'Rejected' => 'bg-red-100 text-red-800',
+                'Picked Up' => 'bg-emerald-100 text-emerald-800',
+            ];
+            $claimLabels = ['Approved' => 'Approved, ready for pickup'];
+        @endphp
+        <section aria-labelledby="claims-heading" class="mt-14">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <h2 id="claims-heading" class="font-display text-2xl font-bold text-[#0F2A4A]">Your claims</h2>
+                <a href="{{ route('claims.index') }}" class="rounded text-sm font-semibold text-[#0F2A4A] underline decoration-[#F5B301] decoration-2 underline-offset-4 hover:decoration-[#0F2A4A]">View all claims</a>
+            </div>
+
+            <ul class="mt-4 divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                @forelse ($claims as $claim)
+                    <li class="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                        <div class="min-w-0">
+                            <a href="{{ route('items.show', $claim->report) }}" class="block truncate font-semibold text-slate-800 hover:underline">{{ $claim->report->item_name }}</a>
+                            <p class="text-sm text-slate-500">{{ $claim->report->category }} &middot; found at {{ $claim->report->place }} &middot; submitted {{ $claim->created_at->format('M j, Y') }}</p>
+                        </div>
+                        <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $claimStyles[$claim->status] ?? 'bg-slate-100 text-slate-600' }}">{{ $claimLabels[$claim->status] ?? $claim->status }}</span>
+                    </li>
+                @empty
+                    <li class="px-5 py-8 text-center text-sm text-slate-500">You haven't submitted any claims yet. Open a found item in <a href="{{ route('items.index') }}" class="font-semibold text-[#0F2A4A] underline">Browse items</a> to claim it.</li>
+                @endforelse
+            </ul>
+        </section>
     </div>
 </x-app-layout>

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Report extends Model
 {
@@ -61,4 +62,14 @@ class Report extends Model
     {
         return $this->photo_path ? Storage::disk('public')->url($this->photo_path) : null;
     }
+        public function claims(): HasMany
+    {
+        return $this->hasMany(Claim::class);
+    }
+        public const STATUSES = [
+        self::STATUS_REPORTED,
+        self::STATUS_PENDING_DROP_OFF,
+        self::STATUS_IN_CUSTODY,
+        self::STATUS_CLAIMED,
+    ];
 }
