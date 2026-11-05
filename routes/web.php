@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\ClaimController as AdminClaimController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ItemController as AdminItemController;
+use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ClaimController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\ItemController as AdminItemController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,23 +28,36 @@ Route::get('/dashboard', function () {
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Dashboard buttons: "I lost an item" and "I found an item"
+// Authenticated user features
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard buttons: "I lost an item" and "I found an item"
     Route::get('/report/{type}', [ReportController::class, 'create'])
         ->whereIn('type', ['lost', 'found'])
         ->name('reports.create');
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', AdminDashboardController::class)->name('dashboard');
-    Route::get('/items', [AdminItemController::class, 'index'])->name('items.index');
-    Route::get('/items/{report}/edit', [AdminItemController::class, 'edit'])->name('items.edit');
-    Route::patch('/items/{report}', [AdminItemController::class, 'update'])->name('items.update');
-});
     Route::post('/report/{type}', [ReportController::class, 'store'])
         ->whereIn('type', ['lost', 'found'])
         ->name('reports.store');
+
+    // User claims
     Route::get('/claims', [ClaimController::class, 'index'])->name('claims.index');
     Route::get('/items/{report}/claim', [ClaimController::class, 'create'])->name('claims.create');
     Route::post('/items/{report}/claim', [ClaimController::class, 'store'])->name('claims.store');
+
+    // Administrator features
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', AdminDashboardController::class)->name('dashboard');
+
+        // Admin item management
+        Route::get('/items', [AdminItemController::class, 'index'])->name('items.index');
+        Route::get('/items/{report}/edit', [AdminItemController::class, 'edit'])->name('items.edit');
+        Route::patch('/items/{report}', [AdminItemController::class, 'update'])->name('items.update');
+
+        // Admin claim review and decisions (Increment 12)
+        Route::get('/claims', [AdminClaimController::class, 'index'])->name('claims.index');
+        Route::get('/claims/{claim}', [AdminClaimController::class, 'show'])->name('claims.show');
+        Route::post('/claims/{claim}/approve', [AdminClaimController::class, 'approve'])->name('claims.approve');
+        Route::post('/claims/{claim}/reject', [AdminClaimController::class, 'reject'])->name('claims.reject');
+    });
 });
 
 Route::middleware('auth')->group(function () {

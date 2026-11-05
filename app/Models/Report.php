@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Report extends Model
 {
@@ -28,8 +28,19 @@ class Report extends Model
     // Set by staff once the found item has actually been handed in.
     public const STATUS_IN_CUSTODY = 'In Custody';
 
+    // Set when an admin approves a claim, awaiting physical pickup.
+    public const STATUS_RESERVED = 'Reserved - Awaiting Pickup';
+
     // Set once the owner has verified their identity and taken the item back.
     public const STATUS_CLAIMED = 'Claimed';
+
+    public const STATUSES = [
+        self::STATUS_REPORTED,
+        self::STATUS_PENDING_DROP_OFF,
+        self::STATUS_IN_CUSTODY,
+        self::STATUS_RESERVED,
+        self::STATUS_CLAIMED,
+    ];
 
     protected $fillable = [
         'user_id',
@@ -62,14 +73,9 @@ class Report extends Model
     {
         return $this->photo_path ? Storage::disk('public')->url($this->photo_path) : null;
     }
-        public function claims(): HasMany
+
+    public function claims(): HasMany
     {
         return $this->hasMany(Claim::class);
     }
-        public const STATUSES = [
-        self::STATUS_REPORTED,
-        self::STATUS_PENDING_DROP_OFF,
-        self::STATUS_IN_CUSTODY,
-        self::STATUS_CLAIMED,
-    ];
 }
