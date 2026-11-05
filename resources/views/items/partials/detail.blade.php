@@ -16,6 +16,10 @@
     Back to browse
 </a>
 
+@if (session('claim_error'))
+    <div role="alert" class="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ session('claim_error') }}</div>
+@endif
+
 @unless ($isAvailable)
     <div class="mt-5 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800" role="status">
         <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-xs text-white" aria-hidden="true">&#10003;</span>
@@ -71,12 +75,18 @@
                     @if ($item->type === 'lost')
                         Found something like this? Let the owner know.
                     @else
-                        Think this is yours? Visit the Lost and Found office with your school ID to claim it.
+                        Think this is yours? Submit a claim with proof of ownership.
                     @endif
                 </p>
                 @if ($item->type === 'lost')
                     <a href="{{ route('reports.create', 'found') }}" class="mt-3 inline-flex rounded-lg bg-[#0F2A4A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#16396a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5B301] focus-visible:ring-offset-2">
                         Report it as found
+                                        </a>
+                @endif
+                @if ($item->type === 'found' && $item->status === \App\Models\Report::STATUS_IN_CUSTODY)
+                    <a href="{{ auth()->check() ? route('claims.create', $item) : route('login') }}"
+                       class="mt-3 inline-flex rounded-lg bg-[#0F2A4A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#16396a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5B301] focus-visible:ring-offset-2">
+                        {{ auth()->check() ? 'Claim this item' : 'Log in to claim' }}
                     </a>
                 @endif
             </div>
