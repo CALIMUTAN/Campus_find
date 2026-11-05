@@ -18,6 +18,10 @@ Route::get('/items', [ItemController::class, 'index'])->name('items.index');
 Route::get('/items/{report}', [ItemController::class, 'show'])->name('items.show');
 
 Route::get('/dashboard', function () {
+    if (request()->user()->isAdmin()) {
+        return redirect()->route('admin.dashboard');
+    }
+
     return view('dashboard', [
         'claims' => request()->user()->claims()->with('report')->latest()->take(5)->get(),
     ]);
