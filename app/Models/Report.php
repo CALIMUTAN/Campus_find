@@ -74,8 +74,13 @@ class Report extends Model
         return $this->photo_path ? Storage::disk('public')->url($this->photo_path) : null;
     }
 
-    public function claims(): HasMany
+        public function claims(): HasMany
     {
         return $this->hasMany(Claim::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(ItemTransaction::class);
     }
 }

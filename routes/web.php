@@ -8,6 +8,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ItemTransactionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +46,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Administrator features
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+
+        Route::get('/transactions', [ItemTransactionController::class, 'index'])
+    ->name('transactions.index');
+
+Route::post('/transactions/{report}/drop-off', [ItemTransactionController::class, 'recordDropOff'])
+    ->name('transactions.dropoff');
+
+Route::post('/transactions/{claim}/pickup', [ItemTransactionController::class, 'confirmPickup'])
+    ->name('transactions.pickup');
+
         Route::get('/', AdminDashboardController::class)->name('dashboard');
 
         // Admin item management

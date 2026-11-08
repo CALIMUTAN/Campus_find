@@ -4,9 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Claim extends Model
 {
+    public function transaction(): HasOne
+{
+    return $this->hasOne(ItemTransaction::class);
+}
+
     public const STATUS_PENDING = 'Pending';
     public const STATUS_APPROVED = 'Approved';   // approved, awaiting pickup
     public const STATUS_REJECTED = 'Rejected';
