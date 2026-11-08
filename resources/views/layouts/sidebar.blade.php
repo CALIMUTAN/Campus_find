@@ -35,13 +35,14 @@
 
     // Admins get their own menu; student-only links are hidden
     if (auth()->user()->isAdmin()) {
-        $mainLinks = [
-            ['label' => 'Admin dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard'), 'icon' => 'home'],
-            ['label' => 'Manage items', 'href' => route('admin.items.index'), 'active' => request()->routeIs('admin.items.*'), 'icon' => 'file'],
-            ['label' => 'Review claims', 'href' => route('admin.claims.index'), 'active' => request()->routeIs('admin.claims.*'), 'icon' => 'claim'],
-            ['label' => 'Browse items', 'href' => route('items.index'), 'active' => request()->routeIs('items.*'), 'icon' => 'search'],
-        ];
-    }
+    $mainLinks = [
+        ['label' => 'Admin dashboard', 'href' => route('admin.dashboard'), 'active' => request()->routeIs('admin.dashboard'), 'icon' => 'home'],
+        ['label' => 'Manage items', 'href' => route('admin.items.index'), 'active' => request()->routeIs('admin.items.*'), 'icon' => 'file'],
+        ['label' => 'Review claims', 'href' => route('admin.claims.index'), 'active' => request()->routeIs('admin.claims.*'), 'icon' => 'claim'],
+        ['label' => 'Manage transactions', 'href' => route('admin.transactions.index'), 'active' => request()->routeIs('admin.transactions.*'), 'icon' => 'claim'],
+        ['label' => 'Browse items', 'href' => route('items.index'), 'active' => request()->routeIs('items.*'), 'icon' => 'search'],
+    ];
+}
     $linkBase = 'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5B301]';
     $linkOn = 'bg-white text-[#0F2A4A]';
     $linkOff = 'text-slate-300 hover:bg-white/10 hover:text-white';
