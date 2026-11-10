@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ItemTransactionController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,6 +39,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/report/{type}', [ReportController::class, 'store'])
         ->whereIn('type', ['lost', 'found'])
         ->name('reports.store');
+
+            // User notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
+
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.readAll');
 
     // User claims
     Route::get('/claims', [ClaimController::class, 'index'])->name('claims.index');

@@ -9,7 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-
+use App\Notifications\ItemClaimNotification;
 class ClaimController extends Controller
 {
     /**
@@ -54,37 +54,73 @@ class ClaimController extends Controller
     /**
      * Approve a claim and update the item status to Reserved.
      */
-    public function approve(Claim $claim): RedirectResponse
-    {
-        // Guard against duplicate decisions
-        if ($claim->status !== Claim::STATUS_PENDING) {
-            return back()->with('error', 'This claim has already been processed.');
-        }
-
-        DB::transaction(function () use ($claim) {
-            // 1. Approve this claim
-            $claim->update([
-                'status' => Claim::STATUS_APPROVED,
-            ]);
-
-            // 2. Change the associated item to Reserved - Awaiting Pickup (FR-15)
-            $claim->report->update([
-                'status' => Report::STATUS_RESERVED,
-            ]);
-
-            // 3. Mark competing pending claims on the same item as Rejected - Item Assigned
-            Claim::where('report_id', $claim->report_id)
-                ->where('id', '!=', $claim->id)
-                ->where('status', Claim::STATUS_PENDING)
-                ->update([
-                    'status' => Claim::STATUS_REJECTED,
-                    'rejection_reason' => 'Rejected - Item has been assigned to an approved claimant.',
-                ]);
-        });
-
-        return redirect()->route('admin.claims.index')
-            ->with('status', 'Claim approved successfully. The item is now marked as Reserved – Awaiting Pickup.');
+   
+public function approve(Claim $claim): RedirectResponse
+{
+    // Prevent duplicate decisions.
+    if ($claim->status !== Claim::STATUS_PENDING) {
+        return back()->with('error', 'This claim has already been processed.');
     }
+
+    $rejectedClaimIds = DB::transaction(function () use ($claim) {
+
+        // 1. Approve the selected claim.
+        $claim->update([
+            'status' => Claim::STATUS_APPROVED,
+        ]);
+
+        // 2. Reserve the associated item.
+        $claim->report->update([
+            'status' => Report::STATUS_RESERVED,
+        ]);
+
+        // 3. Get competing pending claims before rejecting them.
+        $rejectedClaimIds = Claim::where('report_id', $claim->report_id)
+            ->where('id', '!=', $claim->id)
+            ->where('status', Claim::STATUS_PENDING)
+            ->pluck('id');
+
+        // 4. Automatically reject competing claims.
+        Claim::whereIn('id', $rejectedClaimIds)
+            ->update([
+                'status' => Claim::STATUS_REJECTED,
+                'rejection_reason' => 'Rejected - Item has been assigned to an approved claimant.',
+            ]);
+
+        return $rejectedClaimIds;
+    });
+
+    // Send notification only after the transaction succeeds.
+    $claim->load(['user', 'report']);
+
+    $claim->user->notify(new ItemClaimNotification(
+        event: 'claim_approved',
+        title: 'Claim Approved',
+        message: "Your claim for {$claim->report->item_name} has been approved. You can now arrange to pick up your item.",
+        itemName: $claim->report->item_name,
+        reportId: (int) $claim->report_id,
+        claimId: (int) $claim->id
+    ));
+
+    // Notify users whose competing claims were automatically rejected.
+    $rejectedClaims = Claim::with(['user', 'report'])
+        ->whereIn('id', $rejectedClaimIds)
+        ->get();
+
+    foreach ($rejectedClaims as $rejectedClaim) {
+        $rejectedClaim->user->notify(new ItemClaimNotification(
+            event: 'claim_rejected',
+            title: 'Claim Rejected',
+            message: "Your claim for {$rejectedClaim->report->item_name} was rejected because the item has been assigned to another claimant.",
+            itemName: $rejectedClaim->report->item_name,
+            reportId: (int) $rejectedClaim->report_id,
+            claimId: (int) $rejectedClaim->id
+        ));
+    }
+
+    return redirect()->route('admin.claims.index')
+        ->with('status', 'Claim approved successfully. The item is now marked as Reserved – Awaiting Pickup.');
+}
 
     /**
      * Reject a claim with a mandatory reason.
@@ -122,6 +158,17 @@ class ClaimController extends Controller
                 }
             }
         });
+        // Send rejection notification after the transaction succeeds.
+        $claim->load(['user', 'report']);
+
+        $claim->user->notify(new ItemClaimNotification(
+            event: 'claim_rejected',
+            title: 'Claim Rejected',
+            message: "Your claim for {$claim->report->item_name} was rejected. Reason: {$claim->rejection_reason}",
+            itemName: $claim->report->item_name,
+            reportId: (int) $claim->report_id,
+            claimId: (int) $claim->id
+        ));
 
         return redirect()->route('admin.claims.index')
             ->with('status', 'Claim has been rejected.');

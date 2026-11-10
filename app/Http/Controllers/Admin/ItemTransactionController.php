@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Notifications\ItemClaimNotification;
 
 class ItemTransactionController extends Controller
 {
@@ -123,6 +124,16 @@ class ItemTransactionController extends Controller
             ]);
         });
 
+                // Notify the user who submitted the found-item report.
+        $report->load('user');
+
+        $report->user->notify(new ItemClaimNotification(
+            event: 'drop_off_confirmed',
+            title: 'Item Drop-off Confirmed',
+            message: "Your found item, {$report->item_name}, has been received and is now in school custody.",
+            itemName: $report->item_name,
+            reportId: (int) $report->id
+        ));
         return redirect()->route('admin.transactions.index')
             ->with('status', 'Item drop-off recorded successfully. The item is now in school custody.');
     }
@@ -195,6 +206,17 @@ class ItemTransactionController extends Controller
             ]);
         });
 
+                // Notify the claimant that their item has been released.
+        $claim->load(['user', 'report']);
+
+        $claim->user->notify(new ItemClaimNotification(
+            event: 'pickup_completed',
+            title: 'Pickup Completed',
+            message: "You have successfully picked up your item: {$claim->report->item_name}.",
+            itemName: $claim->report->item_name,
+            reportId: (int) $claim->report_id,
+            claimId: (int) $claim->id
+        ));
         return redirect()->route('admin.transactions.index')
             ->with('status', 'Pickup confirmed successfully. The item has been released to the verified claimant.');
     }

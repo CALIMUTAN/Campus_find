@@ -21,7 +21,7 @@
         ['label' => 'Browse items', 'href' => route('items.index'), 'active' => request()->routeIs('items.*'), 'icon' => 'search'],
         ['label' => 'My reports', 'href' => '#', 'active' => false, 'icon' => 'file'],
         ['label' => 'My claims', 'href' => route('claims.index'), 'active' => request()->routeIs('claims.*'), 'icon' => 'tag'],
-        ['label' => 'Notifications', 'href' => '#', 'active' => false, 'icon' => 'bell'],
+       ['label' => 'Notifications', 'href' => route('notifications.index'), 'active' => request()->routeIs('notifications.*'), 'icon' => 'bell'],
     ];
 
     if (auth()->user()->isAdmin()) {
