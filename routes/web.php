@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ItemController as AdminItemController;
 use App\Http\Controllers\Admin\ItemTransactionController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\NotificationController;
@@ -84,6 +85,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/export/csv', [AdminReportController::class, 'csv'])->name('reports.csv');
         Route::get('/reports/export/pdf', [AdminReportController::class, 'pdf'])->name('reports.pdf');
+
+        // Admin user management
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+        Route::patch('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.role');
+        Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend'])->name('users.suspend');
+        Route::post('/users/{user}/activate', [AdminUserController::class, 'activate'])->name('users.activate');
     });
 });
 

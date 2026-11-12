@@ -41,6 +41,7 @@
             ['label' => 'Review claims', 'href' => route('admin.claims.index'), 'active' => request()->routeIs('admin.claims.*'), 'icon' => 'claim'],
             ['label' => 'Manage transactions', 'href' => route('admin.transactions.index'), 'active' => request()->routeIs('admin.transactions.*'), 'icon' => 'claim'],
             ['label' => 'Reports', 'href' => route('admin.reports.index'), 'active' => request()->routeIs('admin.reports.*'), 'icon' => 'file'],
+            ['label' => 'Users', 'href' => route('admin.users.index'), 'active' => request()->routeIs('admin.users.*'), 'icon' => 'user'],
             ['label' => 'Browse items', 'href' => route('items.index'), 'active' => request()->routeIs('items.*'), 'icon' => 'search'],
         ];
     }
