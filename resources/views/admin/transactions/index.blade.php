@@ -111,7 +111,9 @@
                                 <td class="px-4 py-3">
                                     <form method="POST"
                                         action="{{ route('admin.transactions.dropoff', $report) }}"
-                                        class="min-w-48 space-y-2">
+                                        class="min-w-48 space-y-2"
+                                        x-data="{ confirming: false }"
+                                        @submit="if (!confirming) { $event.preventDefault(); confirming = true; }">
                                         @csrf
 
                                         <textarea
@@ -123,10 +125,13 @@
 
                                         <button
                                             type="submit"
-                                            onclick="return confirm('Confirm that this item has been physically received?')"
                                             class="rounded-lg bg-[#0F2A4A] px-3 py-2 text-xs font-semibold text-white hover:bg-[#16396a]">
                                             Confirm Drop-off
                                         </button>
+
+                                        <x-confirm-dialog
+                                            message="Confirm that this item has been physically received?"
+                                            confirm-label="Confirm Drop-off" />
                                     </form>
                                 </td>
                             </tr>
@@ -249,7 +254,9 @@
                                 <td class="px-4 py-3">
                                     <form method="POST"
                                         action="{{ route('admin.transactions.pickup', $claim) }}"
-                                        class="min-w-56 space-y-3">
+                                        class="min-w-56 space-y-3"
+                                        x-data="{ confirming: false }"
+                                        @submit="if (!confirming) { $event.preventDefault(); confirming = true; }">
                                         @csrf
 
                                         <label class="flex items-start gap-2 text-xs text-slate-700">
@@ -274,10 +281,13 @@
 
                                         <button
                                             type="submit"
-                                            onclick="return confirm('Confirm that the item has been released to the verified claimant?')"
                                             class="rounded-lg bg-[#0F2A4A] px-3 py-2 text-xs font-semibold text-white hover:bg-[#16396a]">
                                             Confirm Pickup
                                         </button>
+
+                                        <x-confirm-dialog
+                                            message="Confirm that the item has been released to the verified claimant?"
+                                            confirm-label="Confirm Pickup" />
                                     </form>
                                 </td>
                             </tr>

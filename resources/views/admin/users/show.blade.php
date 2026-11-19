@@ -51,7 +51,9 @@
             {{-- Account actions --}}
             <div class="flex flex-wrap items-end gap-6 pt-5 mt-5 border-t border-slate-200">
                 @can('changeRole', $user)
-                    <form method="POST" action="{{ route('admin.users.role', $user) }}" class="flex items-end gap-2">
+                    <form method="POST" action="{{ route('admin.users.role', $user) }}" class="flex items-end gap-2"
+                          x-data="{ confirming: false }"
+                          @submit="if (!confirming) { $event.preventDefault(); confirming = true; }">
                         @csrf
                         @method('PATCH')
                         <div>
@@ -64,10 +66,11 @@
                         </div>
                         <button type="submit"
                                 style="height:42px;background:#0F2A4A;color:#fff;"
-                                class="inline-flex items-center px-4 text-sm font-semibold rounded-lg hover:opacity-90"
-                                onclick="return confirm('Change this user\'s role?')">
+                                class="inline-flex items-center px-4 text-sm font-semibold rounded-lg hover:opacity-90">
                             Change role
                         </button>
+
+                        <x-confirm-dialog message="Change this user's role?" confirm-label="Change role" />
                     </form>
                 @endcan
 
@@ -84,14 +87,20 @@
                     @endcan
                 @else
                     @can('suspend', $user)
-                        <form method="POST" action="{{ route('admin.users.suspend', $user) }}">
+                        <form method="POST" action="{{ route('admin.users.suspend', $user) }}"
+                              x-data="{ confirming: false }"
+                              @submit="if (!confirming) { $event.preventDefault(); confirming = true; }">
                             @csrf
                             <button type="submit"
                                     style="height:42px;background:#b91c1c;color:#fff;"
-                                    class="inline-flex items-center px-4 text-sm font-semibold rounded-lg hover:opacity-90"
-                                    onclick="return confirm('Suspend this account? They will be signed out immediately.')">
+                                    class="inline-flex items-center px-4 text-sm font-semibold rounded-lg hover:opacity-90">
                                 Suspend account
                             </button>
+
+                            <x-confirm-dialog
+                                message="Suspend this account? They will be signed out immediately."
+                                confirm-label="Suspend"
+                                variant="danger" />
                         </form>
                     @endcan
                 @endif
