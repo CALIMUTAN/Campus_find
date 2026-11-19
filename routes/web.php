@@ -11,6 +11,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Models\Claim;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,17 +24,29 @@ Route::get('/items', [ItemController::class, 'index'])->name('items.index');
 Route::get('/items/{report}', [ItemController::class, 'show'])->name('items.show');
 
 Route::get('/dashboard', function () {
-    if (request()->user()->isAdmin()) {
+    $user = request()->user();
+
+    if ($user->isAdmin()) {
         return redirect()->route('admin.dashboard');
     }
 
     return view('dashboard', [
-        'claims' => request()->user()->claims()->with('report')->latest()->take(5)->get(),
+        // Preview only — "View all reports" on the page links to the full list.
+        'reports' => $user->reports()->latest('date')->take(5)->get(),
+        'claims' => $user->claims()->with('report')->latest()->take(5)->get(),
+        // Whichever approved claim is waiting on pickup, if any.
+        'pickupClaim' => $user->claims()->with('report')
+            ->where('status', Claim::STATUS_APPROVED)
+            ->latest()
+            ->first(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Authenticated user features
 Route::middleware(['auth', 'verified'])->group(function () {
+    // "My reports" — everything the logged-in user has submitted.
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
     // Dashboard buttons: "I lost an item" and "I found an item"
     Route::get('/report/{type}', [ReportController::class, 'create'])
         ->whereIn('type', ['lost', 'found'])

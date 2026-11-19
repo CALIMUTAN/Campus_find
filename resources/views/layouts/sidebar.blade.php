@@ -19,7 +19,7 @@
     $mainLinks = [
         ['label' => 'Dashboard', 'href' => route('dashboard'), 'active' => request()->routeIs('dashboard'), 'icon' => 'home'],
         ['label' => 'Browse items', 'href' => route('items.index'), 'active' => request()->routeIs('items.*'), 'icon' => 'search'],
-        ['label' => 'My reports', 'href' => '#', 'active' => false, 'icon' => 'file'],
+        ['label' => 'My reports', 'href' => route('reports.index'), 'active' => request()->routeIs('reports.index'), 'icon' => 'file'],
         ['label' => 'My claims', 'href' => route('claims.index'), 'active' => request()->routeIs('claims.*'), 'icon' => 'tag'],
         ['label' => 'Notifications', 'href' => route('notifications.index'), 'active' => request()->routeIs('notifications.*'), 'icon' => 'bell'],
     ];
