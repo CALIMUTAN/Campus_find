@@ -18,6 +18,9 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    // Roles an admin can assign. Must match the values stored in users.role.
+    public const ROLES = ['student', 'admin'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -27,6 +30,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'suspended_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -38,11 +42,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class);
     }
-        public function claims(): HasMany
+
+    public function claims(): HasMany
     {
         return $this->hasMany(Claim::class);
     }
-        public function isAdmin(): bool
+
+    public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
