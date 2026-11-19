@@ -4,13 +4,6 @@
     two shells never drift out of sync.
 --}}
 @php
-    $statusStyles = [
-        \App\Models\Report::STATUS_REPORTED => 'bg-[#EEF3F9] text-[#0F2A4A]',
-        \App\Models\Report::STATUS_PENDING_DROP_OFF => 'bg-[#FFF8E1] text-[#946200]',
-        \App\Models\Report::STATUS_IN_CUSTODY => 'bg-[#0F2A4A] text-white',
-        \App\Models\Report::STATUS_CLAIMED => 'bg-emerald-100 text-emerald-800',
-    ];
-
     $hasFilters = collect($filters)->except(['type'])->filter(fn ($value) => filled($value))->isNotEmpty()
         || in_array($filters['type'], ['lost', 'found'], true);
 @endphp
@@ -122,7 +115,7 @@
                                 <span class="text-xs font-bold uppercase tracking-wide {{ $item->type === 'lost' ? 'text-slate-500' : 'text-amber-700' }}">
                                     {{ $item->type === 'lost' ? 'Lost' : 'Found' }}
                                 </span>
-                                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $statusStyles[$item->status] ?? 'bg-slate-100 text-slate-600' }}">
+                                <span class="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $item->statusBadgeClasses() }}">
                                     {{ $item->status }}
                                 </span>
                             </div>

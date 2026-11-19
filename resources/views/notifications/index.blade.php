@@ -3,13 +3,33 @@
     <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-10">
 
         {{-- Page heading --}}
-        <h1 class="font-display text-3xl font-bold text-[#0F2A4A]">
-            Notifications
-        </h1>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="font-display text-3xl font-bold text-[#0F2A4A]">
+                    Notifications
+                </h1>
 
-        <p class="mt-2 text-sm text-slate-500">
-            Stay updated on your item reports and ownership claims.
-        </p>
+                <p class="mt-2 text-sm text-slate-500">
+                    Stay updated on your item reports and ownership claims.
+                </p>
+            </div>
+
+            @if ($notifications->contains(fn ($notification) => is_null($notification->read_at)))
+                <form method="POST" action="{{ route('notifications.readAll') }}">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-[#0F2A4A] hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F2A4A]">
+                        Mark all as read
+                    </button>
+                </form>
+            @endif
+        </div>
+
+        @if (session('status'))
+            <div role="status" class="mt-4 rounded-xl border border-[#F5B301] bg-[#FFF8E1] px-4 py-3 text-sm text-[#0F2A4A]">
+                {{ session('status') }}
+            </div>
+        @endif
 
         {{-- Notification list --}}
         <ul class="mt-6 divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -62,14 +82,26 @@
                     </div>
 
                     {{-- Read / unread status --}}
-                    <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold
-                        {{ $notification->read_at
-                            ? 'bg-slate-100 text-slate-600'
-                            : 'bg-[#FFF8E1] text-[#946200]' }}">
+                    <div class="flex shrink-0 flex-col items-end gap-2">
+                        <span class="rounded-full px-2.5 py-1 text-xs font-semibold
+                            {{ $notification->read_at
+                                ? 'bg-slate-100 text-slate-600'
+                                : 'bg-[#FFF8E1] text-[#946200]' }}">
 
-                        {{ $notification->read_at ? 'Read' : 'Unread' }}
+                            {{ $notification->read_at ? 'Read' : 'Unread' }}
 
-                    </span>
+                        </span>
+
+                        @if (!$notification->read_at)
+                            <form method="POST" action="{{ route('notifications.read', $notification->id) }}">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="text-xs font-semibold text-[#0F2A4A] underline decoration-[#F5B301] decoration-2 underline-offset-4 hover:decoration-[#0F2A4A]">
+                                    Mark as read
+                                </button>
+                            </form>
+                        @endif
+                    </div>
 
                 </li>
 

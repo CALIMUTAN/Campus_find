@@ -16,6 +16,32 @@ class ReportController extends Controller
     // Keep uploads small and fast, especially for students on mobile data.
     private const MAX_PHOTO_KILOBYTES = 2048;
 
+    private const PER_PAGE = 10;
+
+    /**
+     * "My reports": every report the logged-in user has submitted,
+     * not just the preview shown on the dashboard.
+     */
+    public function index(Request $request): View
+    {
+        $type = $request->query('type');
+
+        $reports = $request->user()
+            ->reports()
+            ->when(
+                in_array($type, ['lost', 'found'], true),
+                fn ($query) => $query->where('type', $type)
+            )
+            ->latest('date')
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        return view('reports.index', [
+            'reports' => $reports,
+            'type' => $type,
+        ]);
+    }
+
     public function create(string $type): View
     {
         return view('reports.create', [

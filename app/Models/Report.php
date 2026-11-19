@@ -74,6 +74,23 @@ class Report extends Model
         return $this->photo_path ? Storage::disk('public')->url($this->photo_path) : null;
     }
 
+    /**
+     * Tailwind classes for this report's status badge.
+     * One source of truth so the catalog, dashboard, and "My reports"
+     * page can't drift into showing different colors for the same status.
+     */
+    public function statusBadgeClasses(): string
+    {
+        return match ($this->status) {
+            self::STATUS_REPORTED => 'bg-[#EEF3F9] text-[#0F2A4A]',
+            self::STATUS_PENDING_DROP_OFF => 'bg-[#FFF8E1] text-[#946200]',
+            self::STATUS_IN_CUSTODY => 'bg-[#0F2A4A] text-white',
+            self::STATUS_RESERVED => 'bg-purple-100 text-purple-800',
+            self::STATUS_CLAIMED => 'bg-emerald-100 text-emerald-800',
+            default => 'bg-slate-100 text-slate-600',
+        };
+    }
+
         public function claims(): HasMany
     {
         return $this->hasMany(Claim::class);
