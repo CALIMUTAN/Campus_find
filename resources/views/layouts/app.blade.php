@@ -58,6 +58,60 @@
                 @endisset
 
                 <main>
+                    {{-- fix/cf-017: floating "new notifications" toast, stays put while scrolling --}}
+                    @auth
+                        @php
+                            $unreadNotificationCount = auth()->user()->unreadNotifications()->count();
+                        @endphp
+
+                        @if ($unreadNotificationCount > 0 && ! request()->routeIs('notifications.index'))
+                            <div
+                                x-data="{ dismissed: false }"
+                                x-show="!dismissed"
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 -translate-y-3"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="fixed inset-x-4 top-20 z-50 lg:inset-x-auto lg:right-6 lg:top-6 lg:w-full lg:max-w-sm"
+                            >
+                                <div class="flex items-start gap-3 rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-900/5">
+                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFF8E1] text-[#946200]" aria-hidden="true">
+                                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+                                        </svg>
+                                    </span>
+
+                                    <div class="min-w-0 flex-1 pt-0.5">
+                                        <p class="font-display text-sm font-bold text-[#0F2A4A]">
+                                            {{ $unreadNotificationCount }} new {{ \Illuminate\Support\Str::plural('notification', $unreadNotificationCount) }}
+                                        </p>
+                                        <p class="mt-0.5 text-sm text-slate-500">
+                                            @if ($unreadNotificationCount === 1)
+                                                Something changed on one of your reports or claims.
+                                            @else
+                                                Something changed on {{ $unreadNotificationCount }} of your reports or claims.
+                                            @endif
+                                        </p>
+                                        <a href="{{ route('notifications.index') }}" class="mt-2 inline-block text-sm font-semibold text-[#0F2A4A] underline decoration-[#F5B301] decoration-2 underline-offset-4 hover:decoration-[#0F2A4A]">
+                                            View notifications
+                                        </a>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        @click="dismissed = true"
+                                        class="shrink-0 rounded p-1 text-slate-400 hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F2A4A]"
+                                        aria-label="Dismiss">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                    @endauth
+
                     {{ $slot }}
                 </main>
             </div>

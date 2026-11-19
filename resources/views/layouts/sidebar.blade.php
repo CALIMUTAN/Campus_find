@@ -16,12 +16,15 @@
         'logout' => '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     ];
 
+    // fix/cf-017: badge count for the Notifications link below.
+    $unreadNotificationCount = auth()->user()->unreadNotifications()->count();
+
     $mainLinks = [
         ['label' => 'Dashboard', 'href' => route('dashboard'), 'active' => request()->routeIs('dashboard'), 'icon' => 'home'],
         ['label' => 'Browse items', 'href' => route('items.index'), 'active' => request()->routeIs('items.*'), 'icon' => 'search'],
         ['label' => 'My reports', 'href' => route('reports.index'), 'active' => request()->routeIs('reports.index'), 'icon' => 'file'],
         ['label' => 'My claims', 'href' => route('claims.index'), 'active' => request()->routeIs('claims.*'), 'icon' => 'tag'],
-        ['label' => 'Notifications', 'href' => route('notifications.index'), 'active' => request()->routeIs('notifications.*'), 'icon' => 'bell'],
+        ['label' => 'Notifications', 'href' => route('notifications.index'), 'active' => request()->routeIs('notifications.*'), 'icon' => 'bell', 'badge' => $unreadNotificationCount],
     ];
 
     if (auth()->user()->isAdmin()) {
@@ -136,6 +139,12 @@
                         </svg>
 
                         {{ $link['label'] }}
+
+                        @if (! empty($link['badge']))
+                            <span class="ml-auto inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#F5B301] px-1.5 py-0.5 text-xs font-bold text-[#0F2A4A]">
+                                {{ $link['badge'] > 9 ? '9+' : $link['badge'] }}
+                            </span>
+                        @endif
                     </a>
                 </li>
             @endforeach
