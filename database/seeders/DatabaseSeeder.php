@@ -26,5 +26,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'role' => 'admin',
         ]);
+                User::firstOrCreate(
+            ['email' => 'super_admin@example.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => 'password',
+                'email_verified_at' => now(),
+                'role' => 'super_admin',
+            ]
+        );
     }
 }
