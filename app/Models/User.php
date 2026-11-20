@@ -19,7 +19,11 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     // Roles an admin can assign. Must match the values stored in users.role.
+        // Roles an admin can assign. Must match the values stored in users.role.
     public const ROLES = ['student', 'admin'];
+
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_SUPER_ADMIN = 'super_admin';
 
     /**
      * Get the attributes that should be cast.
@@ -50,6 +54,11 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN], true);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === self::ROLE_SUPER_ADMIN;
     }
 }

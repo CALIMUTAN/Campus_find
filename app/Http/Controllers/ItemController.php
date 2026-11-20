@@ -68,12 +68,23 @@ class ItemController extends Controller
     /**
      * Public detail page for a single report.
      */
-    public function show(Report $report): View
+    public function show(Request $request, Report $report): View
     {
+        $user = $request->user();
+
+        abort_if(
+            $report->status === Report::STATUS_CLAIMED && ! (
+                $user && (
+                    $user->isAdmin()
+                    || $report->user_id === $user->id
+                    || $report->claims()->where('user_id', $user->id)->exists()
+                )
+            ),
+            404
+        );
+
         return view('items.show', [
             'item' => $report,
-            // Claimed items are kept viewable (so a direct link doesn't just 404)
-            // but are flagged as no longer available instead of showing a claim CTA.
             'isAvailable' => $report->status !== Report::STATUS_CLAIMED,
         ]);
     }

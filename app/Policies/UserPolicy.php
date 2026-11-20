@@ -10,18 +10,22 @@ class UserPolicy
     {
         return $actor->isAdmin()
             && $actor->isNot($target)
+            && ! $target->isSuperAdmin()
+            && ($actor->isSuperAdmin() || ! $target->isAdmin())
             && ! $this->isLastActiveAdmin($target);
     }
 
     public function activate(User $actor, User $target): bool
     {
-        return $actor->isAdmin();
+        return $actor->isAdmin()
+            && ($actor->isSuperAdmin() || ! $target->isAdmin());
     }
 
     public function changeRole(User $actor, User $target): bool
     {
         return $actor->isAdmin()
             && $actor->isNot($target)
+            && ! $target->isSuperAdmin()
             && ! $this->isLastActiveAdmin($target);
     }
 
@@ -31,6 +35,8 @@ class UserPolicy
             return false;
         }
 
-        return User::where('role', 'admin')->whereNull('suspended_at')->count() <= 1;
+        return User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN])
+            ->whereNull('suspended_at')
+            ->count() <= 1;
     }
 }
